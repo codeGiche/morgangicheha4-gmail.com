@@ -19,12 +19,24 @@ class Users_model(db.Model):
     
     @classmethod
     def get_single_user_with_id(cls,id):
+        """this method querins for a single user"""
         user= cls.query.filter_by(id=id).first()
         if user:
             return user
         else: 
             return False
 
+    @classmethod
+    def delete_user(cls,id):
+        """this method deletes a single  user"""
+        user_to_delete=cls.query.filter_by(id=id)
+        if user_to_delete.first():
+            user_to_delete.delete()
+            db.session.commit()
+            return True
+        else:
+            return False
+        
 # serializing and deserializing data
 class UserSchema(ma.Schema):
     class Meta:

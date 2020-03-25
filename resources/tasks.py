@@ -1,14 +1,11 @@
-from main import Resource, api, fields
+from main import Resource, api, fields,db
+from models.taskmodel import Task_model,task_schema,tasks_schema
 
 # namespace
 ns_tasks = api.namespace("tasks", description="All tasks regarding tasks")
 
 
-task_list = [
-    {"id": 1, "title": "learn flask-restx", "description": "learn the basices"},
-    {"id": 2, "title": "learn vue js", "description": "learn the basices"},
-    {"id": 3, "title": "learn docker", "description": "learn the basices"},
-]
+
 # models
 task_model = api.model(
     "Task", {"title": fields.String(), "description": fields.String()}
@@ -19,51 +16,55 @@ task_model = api.model(
 class TasksList(Resource):
     def get(self):
         """ use this ednpoint to get a list of tasks """
-        return task_list, 200
+        return tasks_schema.dump(Task_model.query.all()), 200
 
     @api.expect(task_model)
     def post(self):
         """ use this ednpoint to add new tasks """
-
-        data = api.payload
-        data["id"] = len(task_list) + 1
-        task_list.append(data)
-
-        return data, 201
+        try:
+            data = api.payload
+            task_to_create = Task_model(title=data["title"],description=data["description"])
+            task_to_create.create()
+            return task_schema.dump(task_to_create), 201 #created
+        except Exception:
+            return ({"message": "Check your detaile and retry again"}),400 #The request was invalid.
 
 
 @ns_tasks.route("/<int:id>")
 class Task(Resource):
     def get(self, id):
         """retrieve a task by it's id"""
-        return next(filter(lambda x: x["id"] == id, task_list)), 200
-
+        user_to_get = next(filter (lambda x: x["id"] == id, tasks_schema.dump(Task_model.query.all())),None )
+        if user_to_get:
+            return user_to_get,200 #ok
+        else:
+            return ({"message":"Task not found"}),404 #not found
 
     @api.expect(task_model )
     def put(self, id):
         """edit a task by it's id"""
         data = api.payload
-        task = next(filter(lambda x: x["id"] == id, task_list), None)
-        if task:
+        task_to_update = Task_model.query.filter_by(id=id).first()
+        if task_to_update:
             if u'title' in data:
-                task["title"]= data["title"]
-
+                task_to_update.title= data["title"]
             if u'description' in data:
-                task["description"]= data["description"]
-                return task,201 #Created
+                task_to_update.description = data["description"]
+            task_to_update.create()
+            return task_schema.dump(task_to_update),201  #created
 
         else:
-            return {"message": "task not found"},404 
+            return message ({"message":"Task not found"}), 404 #not found
+
+   
         
 
     def delete(self, id):
         """use this endpoint to delete a task"""
         # query  tasl_list for that id
-        # print(next( filter(( lambda x:x["id"]==id ), task_list) )) #this function queries for the object to be deleted and finds the first one
-        to_delete = next(filter((lambda x: x["id"] == id), task_list), None)
-        if to_delete:
-            task_list.remove(to_delete)
-            return {"message": "Task deleted"}, 201
+        task_to_delete= Task_model.query.filter_by(id=id).first()
+        if task_to_delete:
+            Task_model.delete_task(id=id)
+            return ({"message": "Task deleted"}),200 #ok
         else:
-            return {"message": "Task not found"}, 404
-
+            return ({"message":"Task not found"}),404 #not found

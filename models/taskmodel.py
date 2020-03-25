@@ -11,15 +11,28 @@ class Task_model(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    # commiting to db
-    def commit_to_db(self):
+    def create(self):
+        """this method adds to the tasks table"""
         db.session.add(self)
         db.session.commit()
 
-    class TaskSchema(ma.Schema):
-        class Meta:
-            fields = ("id","title","description")
+    @classmethod
+    def delete_task(cls,id):
+        """this method deletes a task"""
+        task_to_delete=cls.query.filter_by(id=id)
+        if task_to_delete.first():
+            task_to_delete.delete()
+            db.session.commit()
+            return True
+        else:
+            return False
 
 
-    task_schema = TaskSchema()
-    tasks_schema = TaskSchema(many=True)
+        
+class TaskSchema(ma.Schema):
+    class Meta:
+        fields = ("id","title","description")
+
+
+task_schema = TaskSchema()
+tasks_schema = TaskSchema(many=True)
