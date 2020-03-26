@@ -1,4 +1,5 @@
 from main import db, ma, fields
+from werkzeug.security import check_password_hash
 
 
 class Users_model(db.Model):
@@ -26,6 +27,7 @@ class Users_model(db.Model):
         else:
             return False
 
+
     @classmethod
     def delete_user(cls, id):
         """this method deletes a single  user"""
@@ -36,6 +38,26 @@ class Users_model(db.Model):
             return True
         else:
             return False
+
+
+    @classmethod
+    def check_if_email_exist(cls,email):
+        """this method chcks if email exists"""
+        email_check = cls.query.filter_by(email=email).first()
+        if email_check:
+            return email_check
+            return True
+        else:
+            return False
+
+    @classmethod
+    def password_check(cls,email,password):
+        email_check = cls.query.filter_by(email=email).first()
+        if email_check and check_password_hash(email_check.password,password):
+            return True
+        else:
+            return False
+
 
 
 # serializing and deserializing data

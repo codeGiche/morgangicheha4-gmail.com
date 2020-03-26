@@ -1,5 +1,6 @@
 from main import Resource, api, fields, db
 from models.taskmodel import Task_model, task_schema, tasks_schema
+from flask_jwt_extended import JWTManager,jwt_required,create_access_token,get_jwt_identity
 
 # namespace
 ns_tasks = api.namespace("tasks", description="All tasks regarding tasks")
@@ -13,17 +14,19 @@ task_model = api.model(
 
 @ns_tasks.route("")
 class TasksList(Resource):
+    @jwt_required
     def get(self):
         """ use this ednpoint to get a list of tasks """
-        return tasks_schema.dump(Task_model.query.all()), 200
+        return tasks_schema.dump(Task_model.query.filter_by(user_id=get_jwt_identity())), 200
 
     @api.expect(task_model)
+    @jwt_required
     def post(self):
         """ use this ednpoint to add new tasks """
         try:
             data = api.payload
             task_to_create = Task_model(
-                title=data["title"], description=data["description"]
+                title=data["title"], description=data["description"],user_id=get_jwt_identity()
             )
             task_to_create.create()
             return task_schema.dump(task_to_create), 201  # created
@@ -36,6 +39,7 @@ class TasksList(Resource):
 
 @ns_tasks.route("/<int:id>")
 class Task(Resource):
+    @jwt_required
     def get(self, id):
         """retrieve a task by it's id"""
         user_to_get = next(
@@ -48,16 +52,20 @@ class Task(Resource):
             return ({"message": "Task not found"}), 404  # not found
 
     @api.expect(task_model)
+    @jwt_required
     def put(self, id):
         """edit a task by it's id"""
+        print(id)
         data = api.payload
+        print(data)
         task_to_update = Task_model.query.filter_by(id=id).first()
+        print(task_to_update.id)
         if task_to_update:
             if u"title" in data:
                 task_to_update.title = data["title"]
             if u"description" in data:
                 task_to_update.description = data["description"]
-            task_to_update.create()
+            # Task_model.update_task(ta)
             return task_schema.dump(task_to_update), 201  # created
 
         else:

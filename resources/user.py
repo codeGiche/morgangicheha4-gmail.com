@@ -1,5 +1,6 @@
 from main import api, fields, Resource
 from models.usermodel import Users_model, user_schema, users_schema
+from flask_jwt_extended import JWTManager,jwt_required,create_access_token,get_jwt_identity
 
 ns_users = api.namespace("users", description="all tasks regarding users")
 
@@ -15,26 +16,7 @@ user_model = api.model(
 )
 
 
-@ns_users.route("")
-class UsersList(Resource):
-    @api.expect(user_model)
-    def post(self):
-        """use this endpoint to create a user"""
-        data = api.payload
-        user_to_create = Users_model(
-            fullname=data["fullname"], email=data["email"], password=data["password"]
-        )
-        user_to_create.create()
-        # the below function turns the user to create object into json and return it to the user
-        return (
-            user_schema.dump(user_to_create),
-            201,
-        )  # 	A new resource was successfully created.
 
-    def get(self):
-        """Use this endpoint to get all users"""
-
-        return users_schema.dump(Users_model.query.all()), 200  # ok
 
 
 @ns_users.route("/<int:id>")

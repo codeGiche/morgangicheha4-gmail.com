@@ -17,6 +17,17 @@ class Task_model(db.Model):
         db.session.commit()
 
     @classmethod
+    def update_task(cls,id,title=None, description=None):
+        task_to_update = cls.query.filter_by(id=id).first()
+        if task_to_update:
+            task_to_update.title= title
+            task_to_update.description = description
+            db.session.commit()
+            return True
+        else:
+            return False
+
+    @classmethod
     def delete_task(cls,id):
         """this method deletes a task"""
         task_to_delete=cls.query.filter_by(id=id)
