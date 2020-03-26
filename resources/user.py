@@ -63,17 +63,16 @@ class Users(Resource):
         data = api.payload
         user_to_update = Users_model.query.filter_by(id=id).first()
         if user_to_update:
-            if u'fullname' in data:
+            if u"fullname" in data:
                 user_to_update.fullname = data["fullname"]
-            if u'email' in data:
+            if u"email" in data:
                 user_to_update.email = data["email"]
-            if u'password' in data:
+            if u"password" in data:
                 user_to_update.password = data["password"]
             user_to_update.create()
-            return user_schema.dump(user_to_update),201 #created
+            return user_schema.dump(user_to_update), 201  # created
         else:
-            return ({"message":"User not found"}),404 #not found
-
+            return ({"message": "User not found"}), 404  # not found
 
     def delete(self, id):
         """delete a user by id"""
