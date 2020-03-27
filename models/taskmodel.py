@@ -17,15 +17,10 @@ class Task_model(db.Model):
         db.session.commit()
 
     @classmethod
-    def update_task(cls,id,title=None, description=None):
-        task_to_update = cls.query.filter_by(id=id).first()
-        if task_to_update:
-            task_to_update.title= title
-            task_to_update.description = description
-            db.session.commit()
-            return True
-        else:
-            return False
+    def update_task(cls,obj=None):
+        """tis method is to update a task"""
+        db.session.commit()
+        return True
 
     @classmethod
     def delete_task(cls,id):

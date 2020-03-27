@@ -2,12 +2,27 @@ from flask import Flask
 from flask_restx import Api, Resource, fields
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
-from flask_jwt_extended import JWTManager,jwt_required,create_access_token,get_jwt_identity
+from flask_jwt_extended import (
+    JWTManager,
+    jwt_required,
+    create_access_token,
+    get_jwt_identity,
+)
 import os
+from werkzeug.exceptions import Unauthorized
 
 
 app = Flask(__name__)
 
+
+authorizations = {
+    "apikey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Type in the *value into the box below**Bearer & where jwt is token",
+    }
+}
 
 
 # cofiguring db
@@ -16,12 +31,17 @@ app.config["SECRET_KEY"] = "ss"
 app.config["JWT_SECRET_KEY"] = "ss"
 api = Api(
     app,
-    
+    authorizations=authorizations,
     title="Task management api",
     description="task manager api",
     version="1.0",
     author="Giche",
 )
+
+# error handling
+@api.errorhandler(Unauthorized)
+def unauthorized(error):
+    return {"message":"Login is required!!"}
 
 jwt = JWTManager(app)
 db = SQLAlchemy(app)
