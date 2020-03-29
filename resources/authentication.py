@@ -12,7 +12,7 @@ register_model = api.model(
     "User",
     {
         "fullname": fields.String(),
-        "email": fields.String(),
+        "email": fields.String(min_length=5),
         "password": fields.String(),
     },
 )
@@ -24,7 +24,9 @@ login_model = api.model(
 
 
 @ns_login.route("")
+
 class Login(Resource):
+    
     @api.expect(login_model)
     def post(self):
         """use this endpoint to login a user"""

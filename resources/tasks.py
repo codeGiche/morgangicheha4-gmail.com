@@ -3,7 +3,7 @@ from models.taskmodel import Task_model, task_schema, tasks_schema
 from flask_jwt_extended import JWTManager,jwt_required,create_access_token,get_jwt_identity
 
 # namespace
-ns_tasks = api.namespace("tasks", description="All tasks regarding tasks")
+ns_tasks = api.namespace("tasks", description="All tasks regarding tasks",)
 
 
 # models
@@ -14,12 +14,16 @@ task_model = api.model(
 
 @ns_tasks.route("")
 class TasksList(Resource):
+    @api.response(200, 'Success')
     @api.doc(security="apikey") #documenting decurity
     @jwt_required
     def get(self):
         """ use this ednpoint to get a list of tasks """
         return tasks_schema.dump(Task_model.query.filter_by(user_id=get_jwt_identity())), 200
 
+
+    @api.response(201, 'Success')
+    @api.response(400, 'The request was invalid.')
     @api.doc(security="apikey")
     @api.expect(task_model)
     @jwt_required
@@ -34,14 +38,19 @@ class TasksList(Resource):
             return task_schema.dump(task_to_create), 201  # created
         except Exception:
             return (
-                ({"message": "Check your detaile and retry again"}),
+                ({"message": "Check your details and retry again"}),
                 400,
             )  # The request was invalid.
 
 
 @ns_tasks.route("/<int:id>")
 class Task(Resource):
+    
+    @api.response(404, 'Task not found.')
+    @api.response(200, 'ok.')
+
     @api.doc(security="apikey")
+    @api.doc(params={'id': 'task id'}) #this add a placeholde to the enter id section in the docmentation
     @jwt_required
     def get(self, id):
         """retrieve a task by it's id"""
@@ -56,6 +65,7 @@ class Task(Resource):
 
     @api.expect(task_model)
     @api.doc(security="apikey")
+    @api.doc(params={'id': 'An of the task to update'})
     @jwt_required
     def put(self, id):
         """edit a task by it's id"""
@@ -77,6 +87,7 @@ class Task(Resource):
         else:
             return message({"message": "Task not found"}), 404  # not found
     @api.doc(security="apikey")
+    @api.doc(params={'id': 'An ID of task to delete'})
     @jwt_required #make sure user is authenticated
     def delete(self, id):
         """use this endpoint to delete a task"""

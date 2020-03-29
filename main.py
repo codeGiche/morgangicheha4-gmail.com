@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask,Blueprint
 from flask_restx import Api, Resource, fields
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -15,6 +15,7 @@ from werkzeug.exceptions import Unauthorized
 app = Flask(__name__)
 
 
+
 authorizations = {
     "apikey": {
         "type": "apiKey",
@@ -25,12 +26,17 @@ authorizations = {
 }
 
 
-# cofiguring db
+
+app.config['RESTX_VALIDATE'] = True
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DB_RESTX")
-app.config["SECRET_KEY"] = "ss"
-app.config["JWT_SECRET_KEY"] = "ss"
+# cofiguring db
+app.config["SECRET_KEY"] = os.urandom(20)
+app.config["JWT_SECRET_KEY"] = os.urandom(20)
+# disable Try it Out for all methods
+# app.config.SWAGGER_SUPPORTED_SUBMIT_METHODS = ["get", "post","put"]
 api = Api(
     app,
+    #to turn documentation off set doc=Flase
     authorizations=authorizations,
     title="Task management api",
     description="task manager api",
@@ -41,7 +47,8 @@ api = Api(
 # error handling
 @api.errorhandler(Unauthorized)
 def unauthorized(error):
-    return {"message":"Login is required!!"}
+    return {"message": "Login is required!!"}
+
 
 jwt = JWTManager(app)
 db = SQLAlchemy(app)

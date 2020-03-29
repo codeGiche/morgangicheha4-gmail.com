@@ -9,9 +9,9 @@ ns_users = api.namespace("users", description="all tasks regarding users")
 user_model = api.model(
     "User",
     {
-        "fullname": fields.String(),
-        "email": fields.String(),
-        "password": fields.String(),
+        "fullname": fields.String(description ="Fullname is required", required=True),
+        "email": fields.String(description= "Your email", required=True),
+        "password": fields.String(description="Your password", required=True)
     },
 )
 
@@ -21,6 +21,7 @@ user_model = api.model(
 
 @ns_users.route("/<int:id>")
 class Users(Resource):
+   
     def get(self, id):
         """Use this endpoin to get one user by id"""
         queried_user = Users_model.get_single_user_with_id(id=id)
@@ -42,6 +43,7 @@ class Users(Resource):
     @api.expect(user_model)
     def put(self, id):
         """edit a user by id"""
+        
         data = api.payload
         user_to_update = Users_model.query.filter_by(id=id).first()
         if user_to_update:
@@ -55,7 +57,7 @@ class Users(Resource):
             return user_schema.dump(user_to_update), 201  # created
         else:
             return ({"message": "User not found"}), 404  # not found
-
+    @api.deprecated
     def delete(self, id):
         """delete a user by id"""
         user_to_delete = Users_model.query.filter_by(id=id).first()
