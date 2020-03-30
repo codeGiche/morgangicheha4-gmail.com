@@ -1,4 +1,4 @@
-from main import api, fields, Resource
+from main import api, fields, Resource,db
 from models.usermodel import Users_model, user_schema, users_schema
 from flask_jwt_extended import (
     JWTManager,
@@ -27,6 +27,8 @@ user_model = api.model(
 
 @ns_users.route("")
 class User_list(Resource):
+
+
     @api.doc(security="apikey")
     @jwt_required
     def get(self):
@@ -43,6 +45,26 @@ class User_list(Resource):
 
 @ns_users.route("/<int:_id>")
 class Users(Resource):
+    @api.doc(security="apikey")
+    @jwt_required
+    def post(self,_id):
+        """Use this endpoint to promote a user"""
+        logged_in_user = Users_model.query.filter_by(id=get_jwt_identity()).first()  # quering for logged in user
+        if logged_in_user.is_admin == True:
+            user_to_promote=Users_model.query.filter_by(id=_id).first()
+            if user_to_promote:
+                user_to_promote.is_admin=True
+                db.session.commit()
+                return {"message":"User promoted"},200
+
+            else:
+                return {"message": "User not found."},404
+
+        else:
+            return {"message":"Adimn preeledge"}
+            
+
+
     @api.doc(security="apikey")
     @jwt_required
     def get(self, _id):
