@@ -1,38 +1,63 @@
 from main import api, fields, Resource
 from models.usermodel import Users_model, user_schema, users_schema
-from flask_jwt_extended import JWTManager,jwt_required,create_access_token,get_jwt_identity
+from flask_jwt_extended import (
+    JWTManager,
+    jwt_required,
+    create_access_token,
+    get_jwt_identity,
+)
+
 
 ns_users = api.namespace("users", description="all tasks regarding users")
 
-
-# this helps the user know hoe to input the data
+# this helps the user know how to input the data
 user_model = api.model(
     "User",
     {
-        "fullname": fields.String(description ="Fullname is required", required=True),
-        "email": fields.String(description= "Your email", required=True),
-        "password": fields.String(description="Your password", required=True)
+        "fullname": fields.String(
+            description="Fullname is required", required=True, min_length=2
+        ),
+        "email": fields.String(description="Your email", required=True, min_length=2),
+        "password": fields.String(
+            description="Your password", required=True, min_length=2
+        ),
     },
 )
 
 
+@ns_users.route("")
+class User_list(Resource):
+    @api.doc(security="apikey")
+    @jwt_required
+    def get(self):
+        """Use this endpoint to get all users"""
 
-
-
-@ns_users.route("/<int:id>")
-class Users(Resource):
-   
-    def get(self, id):
-        """Use this endpoin to get one user by id"""
-        queried_user = Users_model.get_single_user_with_id(id=id)
-        if queried_user:
-            return user_schema.dump(queried_user), 200  # ok
+        logged_in_user = Users_model.query.filter_by(
+            id=get_jwt_identity()
+        ).first()  # quering for logged in user
+        if logged_in_user.is_admin == True:
+            return users_schema.dump(Users_model.query.all()), 200
         else:
-            return (
-                ({"message": "user not found!"}),
-                404,
-            )  # The requested resource was not found.
+            return {"message": "Admin preveleges required!"}
 
+
+@ns_users.route("/<int:_id>")
+class Users(Resource):
+    @api.doc(security="apikey")
+    @jwt_required
+    def get(self, _id):
+        """Use this endpoin to get one user by id"""
+        logged_in_user = Users_model.query.filter_by(id=get_jwt_identity()).first()  # quering for logged in user
+        if logged_in_user.is_admin == True:
+
+            queried_user = Users_model.query.filter_by(id=_id).first()
+            if queried_user:
+                return user_schema.dump(queried_user), 200  # ok
+            else:
+                return (({"message": "user not found!"}),404)  # The requested resource was not found.
+        else:
+            return {"message":"Admin prevelges required"}
+    
         # print(Users_model.query.all())
         # user = next((filter((lambda x: x["id"] == id), users_list)), None)
         # if user:
@@ -41,9 +66,10 @@ class Users(Resource):
         #     return ({"message": "user not found"},404,)  # The requested resource was not found.
 
     @api.expect(user_model)
+    # @jwt_required
     def put(self, id):
         """edit a user by id"""
-        
+
         data = api.payload
         user_to_update = Users_model.query.filter_by(id=id).first()
         if user_to_update:
@@ -57,15 +83,24 @@ class Users(Resource):
             return user_schema.dump(user_to_update), 201  # created
         else:
             return ({"message": "User not found"}), 404  # not found
-    @api.deprecated
-    def delete(self, id):
+
+    # @api.deprecated
+    @api.doc(security="apikey")
+    @jwt_required
+    def delete(self, _id):
         """delete a user by id"""
-        user_to_delete = Users_model.query.filter_by(id=id).first()
-        if user_to_delete:
-            Users_model.delete_user(id=id)
-            return ({"message": "User deleted!"}), 200  # ok
+        logged_in_user = Users_model.query.filter_by(id=get_jwt_identity()).first()  # quering for logged in user
+        if logged_in_user.is_admin == True:
+
+            user_to_delete = Users_model.query.filter_by(id=_id).first()
+            if user_to_delete:
+                Users_model.delete_user(id=id)
+                return ({"message": "User deleted!"}), 200  # ok
+            else:
+                return ({"message": "User not found"}), 404  # not found
+
         else:
-            return ({"message": "User not found"}), 404  # not found
+            return {"message": "Admin preveleges required for deletion!"}
 
         # to_delete = next(filter((lambda x: x["id"] == id), users_list), None)
         # if to_delete:

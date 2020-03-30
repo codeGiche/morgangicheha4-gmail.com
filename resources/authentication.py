@@ -36,7 +36,9 @@ class Login(Resource):
         if email_check:
             if Users_model.password_check(email= email_check.email,password= data["password"]):
                 token = create_access_token(identity=email_check.id)
+                
                 return ({"access_token":token}),200 #ok
+                
             else:
                 return ({"message":"inavlid credentials pass"}),401 #Unauthorized
         else:

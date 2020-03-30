@@ -8,18 +8,24 @@ ns_tasks = api.namespace("tasks", description="All tasks regarding tasks",)
 
 # models
 task_model = api.model(
-    "Task", {"title": fields.String(), "description": fields.String()}
+    "Task", {"title": fields.String(min_length=1), "description": fields.String(min_length=1)}
 )
+
 
 
 @ns_tasks.route("")
 class TasksList(Resource):
+
+
     @api.response(200, 'Success')
     @api.doc(security="apikey") #documenting decurity
     @jwt_required
     def get(self):
         """ use this ednpoint to get a list of tasks """
+       
+      
         return tasks_schema.dump(Task_model.query.filter_by(user_id=get_jwt_identity())), 200
+
 
 
     @api.response(201, 'Success')
@@ -54,12 +60,13 @@ class Task(Resource):
     @jwt_required
     def get(self, id):
         """retrieve a task by it's id"""
-        user_to_get = next(
+        task_to_get = next(
             filter(lambda x: x["id"] == id, tasks_schema.dump(Task_model.query.all())),
             None,
         )
-        if user_to_get:
-            return user_to_get, 200  # ok
+        if task_to_get:
+            
+            return task_to_get, 200  # ok
         else:
             return ({"message": "Task not found"}), 404  # not found
 
@@ -98,3 +105,4 @@ class Task(Resource):
             return ({"message": "Task deleted"}), 200  # ok
         else:
             return ({"message": "Task not found"}), 404  # not found
+
