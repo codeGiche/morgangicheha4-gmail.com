@@ -10,7 +10,6 @@ class Users_model(db.Model):
     email = db.Column(db.String(80), nullable=False, unique=True)
     password = db.Column(db.String(), nullable=False)
     is_admin= db.Column(db.Boolean,default=False)
-
     tasks = db.relationship("Task_model", backref="user", lazy=True)
     # category = db.relationship('Category',backref=db.backref('user', lazy=True))
 
