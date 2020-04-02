@@ -26,18 +26,28 @@ authorizations = {
     }
 }
 
+###########################DEVELOPMENT CONFIG########################################
 
 app.config["RESTX_VALIDATE"] = True
 app.config["PROPAGATE_EXCEPTIONS"] = False
-# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DB_RESTX")
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db_test.db"
-
 
 # cofiguring db
+
+# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DB_RESTX")
 app.config["SECRET_KEY"] = os.urandom(20)
 app.config["JWT_SECRET_KEY"] = os.urandom(20)
 # disable Try it Out for all methods
 # app.config.SWAGGER_SUPPORTED_SUBMIT_METHODS = ["get", "post","put"]
+
+###########################TESTING CONFIG########################################
+
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db_test.db"
+
+
+
+
+
+
 api = Api(
     blueprint,doc="/doc",
     

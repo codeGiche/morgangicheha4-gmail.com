@@ -2,7 +2,7 @@ from main import app
 import json
 from tests.skeleton_test import Skeleton_test
 
-class Login_test(Skeleton_test):
+class Test_login(Skeleton_test):
     """This class test login"""
     def test_login(self):
         """testing succesful login"""
