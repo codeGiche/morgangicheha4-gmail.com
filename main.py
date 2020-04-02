@@ -29,8 +29,8 @@ authorizations = {
 
 app.config["RESTX_VALIDATE"] = True
 app.config["PROPAGATE_EXCEPTIONS"] = False
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DB_RESTX")
-# app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db_test.db"
+# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DB_RESTX")
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db_test.db"
 
 
 # cofiguring db

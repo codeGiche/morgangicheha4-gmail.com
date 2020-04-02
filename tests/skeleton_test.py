@@ -12,3 +12,4 @@ class Skeleton_test(unittest.TestCase):
         """teardown method deletes all record after test is run"""
         db.session.remove()
         db.drop_all()
+        db.create_all()
