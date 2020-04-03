@@ -2,7 +2,7 @@ from tests.skeleton_test import Skeleton_test
 from main import app
 import json
 import ast
-import requests
+
 
 class Post_task_test(Skeleton_test):
     """This test tests posting tasks"""

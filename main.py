@@ -28,12 +28,12 @@ authorizations = {
 
 ###########################DEVELOPMENT CONFIG########################################
 
-app.config["RESTX_VALIDATE"] = True
+# app.config["RESTX_VALIDATE"] = True
 app.config["PROPAGATE_EXCEPTIONS"] = False
 
 # cofiguring db
 
-# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DB_RESTX")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DB_RESTX")
 app.config["SECRET_KEY"] = os.urandom(20)
 app.config["JWT_SECRET_KEY"] = os.urandom(20)
 # disable Try it Out for all methods
@@ -41,7 +41,7 @@ app.config["JWT_SECRET_KEY"] = os.urandom(20)
 
 ###########################TESTING CONFIG########################################
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db_test.db"
+# app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db_test.db"
 
 
 
