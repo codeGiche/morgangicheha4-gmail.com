@@ -33,7 +33,8 @@ app.config["PROPAGATE_EXCEPTIONS"] = False
 
 # cofiguring db
 
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DB_RESTX")
+# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DB_RESTX")
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:morgan8514@127.0.0.1:5432/restx"
 app.config["SECRET_KEY"] = os.urandom(20)
 app.config["JWT_SECRET_KEY"] = os.urandom(20)
 # disable Try it Out for all methods
@@ -107,4 +108,4 @@ from resources.authentication import *
 #     division_by_zero = 1 / 0
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
