@@ -52,8 +52,6 @@ class Register(Resource):
     def post(self):
         """use this endpoint to register a user"""
         data = api.payload
-        # if not u'email'  in data :
-        #     return {"message":"server cannot or will not process the request due to an apparent client error"},400
         email_check=Users_model.check_if_email_exist(email=data["email"])
         if email_check:
             return ({"message":"Email aready registered!"}),400 #bad request
