@@ -8,6 +8,7 @@ import os
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 from werkzeug.exceptions import Unauthorized
+from configs.config import DevelopmentConfig
 
 sentry_sdk.init(
     dsn="https://ade2752e447d4f70b428fd02d0cfc85e@sentry.io/5181613",
@@ -26,28 +27,8 @@ authorizations = {
     }
 }
 
-###########################DEVELOPMENT CONFIG########################################
-
-# app.config["RESTX_VALIDATE"] = True
-app.config["PROPAGATE_EXCEPTIONS"] = False
-
-# cofiguring db
-
-# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DB_RESTX")
-# app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:morgan8514@127.0.0.1:5432/restx"
-app.config["SECRET_KEY"] = os.urandom(20)
-app.config["JWT_SECRET_KEY"] = os.urandom(20)
-# disable Try it Out for all methods
-# app.config.SWAGGER_SUPPORTED_SUBMIT_METHODS = ["get", "post","put"]
-
-###########################TESTING CONFIG########################################
-
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db_test.db"
-
-
-
-
-
+# calling configs
+app.config.from_object(DevelopmentConfig)
 
 api = Api(
     blueprint,doc="/doc",

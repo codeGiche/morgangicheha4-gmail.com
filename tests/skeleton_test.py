@@ -1,8 +1,9 @@
 import unittest
 import json
-
+from configs.config import TestingConfig
 from main import app,db
 
+app.config.from_object(TestingConfig)
 class Skeleton_test(unittest.TestCase):
     """This is a skeleton for all all tests"""
     def setUp(self):
