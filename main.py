@@ -10,10 +10,7 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 from werkzeug.exceptions import Unauthorized
 from configs.config import DevelopmentConfig
 
-sentry_sdk.init(
-    dsn="https://ade2752e447d4f70b428fd02d0cfc85e@sentry.io/5181613",
-    integrations=[FlaskIntegration()],
-)
+
 app = Flask(__name__)
 
 blueprint = Blueprint("api",__name__,url_prefix="/api")
