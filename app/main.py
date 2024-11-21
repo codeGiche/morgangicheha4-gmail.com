@@ -29,13 +29,13 @@ app.config.from_object(DevelopmentConfig)
 
 api = Api(
     blueprint,doc="/doc",
-    
+
     # to turn documentation off set doc=Flase
     authorizations=authorizations,
     title="Task management api",
     description="task manager api",
     version="1.0",
-    author="Giche",
+    author="Gicheha",
 )
 app.register_blueprint(blueprint)
 # importing error handlers
@@ -51,7 +51,7 @@ from models.usermodel import Users_model
 from models.taskmodel import Task_model
 
 
-@app.before_first_request
+@app.before_request
 def create():
     db.create_all()
 
